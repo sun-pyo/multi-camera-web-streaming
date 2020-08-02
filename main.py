@@ -25,8 +25,6 @@ app.config['BASIC_AUTH_FORCE'] = True
 basic_auth = BasicAuth(app)
 last_epoch = 0
 
-first = True
-
 @app.route('/')
 @basic_auth.required
 def index():
@@ -34,8 +32,7 @@ def index():
 
 def gen():
 
-    if first:
-        imageHub = imagezmq.ImageHub()
+    imageHub = imagezmq.ImageHub()
 
     frameDict = {}
     lastActive = {}
