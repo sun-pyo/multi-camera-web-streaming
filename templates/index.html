@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drone</title>
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-firestore.js"></script>
+    <script>
+        function insert_pan(num){
+            document.pan.panview.value = document.pan.panview.value + num
+            
+        }
+        function equal_pan(){
+            var pan_exp = document.pan.panview.value;
+            if(pan_exp){
+                document.pan.panview.value=eval(pan_exp)
+            }
+        }
+        function insert_tilt(num){
+            document.tilt.tiltview.value = document.tilt.tiltview.value + num
+        }
+        function equal_tilt(){
+            var tilt_exp = document.tilt.tiltview.value;
+            if(tilt_exp){
+                document.tilt.tiltview.value=eval(tilt_exp)
+            }
+        }
+        function init(){
+            document.tilt.tiltview.value = 0
+            document.pan.panview.value = 0
+        }
+    </script>
+
+     <style>
+         *{
+          margin:2;
+          padding:2;
+        }
+        button{
+          width:150;
+          height:150;
+          font-size:50;
+          font-style:bord;
+          margin:2;
+          cursor:pointer
+        }
+      </style>
+    </head>
+</head>
+<body>
+    <h1>Raspberry Pi Security Feed</h1>
+    <img id="bg" src="{{ url_for('video_feed') }}">
+    <h1 id="NumberOfDroneOutput">Number of Drone: </h1>
+    <h2 id="timedate">Date: </h2>
+    <input type="textfield" id="Num_of_drone" />
+    <button id ="saveButton">Save</button>
+    <button id ="loadButton">Load</button>
+    <div class="controller">
+        <table>
+            <caption>controlrobot</caption>
+            <tr>
+                <td><input class="button" type="button" value="-" ></td>
+                <td><input class="button" type="button" value="U" id="UPButton"onclick="insert_tilt('+'+1);equal_tilt()"></td>
+                <td><input class="button" type="button" value="-" ></td>
+            </tr>
+            <tr>
+                <td><input class="button" type="button" value="L" id="LEFTButton" onclick="insert_pan(-1);equal_pan()"></td>
+                <td><input class="button" type="button" value="C" id="initButton" onclick="init()" ></td>
+                <td><input class="button" type="button" value="R" id="RIGHTButton" onclick="insert_pan('+'+1);equal_pan()"></td>
+            </tr>
+            <tr>
+                <td><input class="button" type="button" value="-"></td>
+                <td><input class="button" type="button" value="D" id="DOWNButton" onclick="insert_tilt(-1);equal_tilt()"></td>
+                <td><input class="button" type="button" value="-"></td>
+            </tr>       
+        </table>
+        <caption>pan</caption>
+        <form name = "pan" name="pan" id=pan>
+            <input type="panview" name="panview" id="panview">
+        </form>
+        <caption>tilt</caption>
+        <form name = "tilt" name="tilt" id=tilt>
+            <input type="tiltview" name="tiltview" id="tiltview">
+        </form>
+    </div>
+    <script src="{{ url_for('static',filename='app.js') }}"></script>
+
+
+</body>
+</html>
