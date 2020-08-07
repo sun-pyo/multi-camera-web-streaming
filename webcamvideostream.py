@@ -33,8 +33,8 @@ class WebcamVideoStream:
         self.stopped = False
         time.sleep(2.0)
 
-    frame_static = cv2.imread('default.jpg')
-    montages_static = cv2.imread('default.jpg')
+    frame_static = None
+    montages_static = None
     
     def start(self):
         print("start thread")
@@ -70,6 +70,8 @@ class WebcamVideoStream:
             # build a montage using images in the frame dictionary
             self.montages = build_montages(self.frameDict.values(), (self.w, self.h), (self.mW, self.mH))
             self.update_montages(self.montages)
+
+            cv2.waitKey(1)
 
             if (datetime.now() - self.lastActiveCheck).seconds > self.ACTIVE_CHECK_SECONDS:
                 # loop over all previously active devices

@@ -41,7 +41,7 @@ def gen():
                         b'Content-Type: image/jpeg\r\n\r\n' + jpeg.tobytes() + b'\r\n\r\n')
             else:
                 print("frame is none")
-        cv2.waitKey(1)
+        
 
 
 @app.route('/video_feed')
