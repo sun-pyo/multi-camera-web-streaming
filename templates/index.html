@@ -32,10 +32,10 @@
             document.pan.panview.value = 0
         }
         if (!!window.EventSource) {
-        var source = new EventSource('/drone_num');
-        source.onmessage = function(e) {
-            $("#Drone_Num").text("Num of Drone: " + e.data);
-        }
+            var source = new EventSource('/drone_num');
+            source.onmessage = function(e) {
+                $("#Drone_Num").text(e.data);
+            }
         }
     </script>
 

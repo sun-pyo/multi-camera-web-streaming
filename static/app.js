@@ -139,4 +139,6 @@ RIGHTButton.addEventListener("click", function() {
       });
   }
 
-  getRealtimeUpdates();
+
+
+

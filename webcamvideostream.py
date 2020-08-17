@@ -17,6 +17,7 @@ class WebcamVideoStream:
         self.imageHub = imagezmq.ImageHub()
         self.frameDict = {}
         self.lastActive = {}
+
         self.lastActiveCheck = datetime.now()
         self.ESTIMATED_NUM_PIS = 4
         self.ACTIVE_CHECK_PERIOD = 10
@@ -27,13 +28,13 @@ class WebcamVideoStream:
         self.w = 0
         self.h = 0
 
-        (self.rpiName, self.frame) = self.imageHub.recv_image()
+        (self.dnum, self.rpiName, self.frame) = self.imageHub.recv_image()
         self.imageHub.send_reply(b'OK')
         self.montages = self.frame
         self.stopped = False
         time.sleep(2.0)
 
-    frame_static = None
+    dnum_static = {}
     montages_static = None
     
     def start(self):
@@ -48,8 +49,9 @@ class WebcamVideoStream:
         while True:
             if self.stopped:
                 return
-            (self.rpiName, self.frame) = self.imageHub.recv_image()
+            (self.dnum, self.rpiName, self.frame) = self.imageHub.recv_image()
             self.imageHub.send_reply(b'OK')
+            self.update_dnum(self.dnum, self.rpiName)
 
             if self.rpiName not in self.lastActive.keys():
                 print("[INFO] receiving data from {}...".format(self.rpiName))
@@ -87,12 +89,26 @@ class WebcamVideoStream:
                 self.lastActiveCheck = datetime.now()
 
     @classmethod
+    def update_dnum(cls, dnum, name):
+        cls.dnum_static[name] = dnum
+
+    @classmethod
     def update_montages(cls, montages):
         cls.montages_static = montages
 
     @classmethod
+    def read_dnum(cls, name):
+        name = str(name)
+        if name in cls.dnum_static:
+            return cls.dnum_static[name]
+        else:
+            return 0    
+
+    @classmethod
     def read_montages(cls):
         return cls.montages_static
+
+
 
     def stop(self):
         self.stopped = True

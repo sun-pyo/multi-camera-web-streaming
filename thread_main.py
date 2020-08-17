@@ -31,7 +31,7 @@ last_epoch = 0
 @app.route('/')
 @basic_auth.required
 def index():
-    return render_template('index.html', html_dnum = WebcamVideoStream.read_dnum())
+    return render_template('index.html')
 
 def gen():
     while True:
@@ -53,10 +53,14 @@ def video_feed():
 
 @app.route('/drone_num')
 def drone_num():
+    rpi_name_list = ['cam1','cam2','cam3','cam4','cam5']
     if request.headers.get('accept') == 'text/event-stream':
         def events():
             while True:
-                yield "data: %d\n\n" % (WebcamVideoStream.read_dnum())
+                yield "data: %s:%d %s:%d %s:%d %s:%d\n\n" % (rpi_name_list[0], WebcamVideoStream.read_dnum(rpi_name_list),
+                                                            rpi_name_list[1], WebcamVideoStream.read_dnum(rpi_name_list[1]),
+                                                            rpi_name_list[2], WebcamVideoStream.read_dnum(rpi_name_list[2]),
+                                                            rpi_name_list[3], WebcamVideoStream.read_dnum(rpi_name_list[3]))
                 time.sleep(.1)  # an artificial delay
         return Response(events(), content_type='text/event-stream')
     return redirect(url_for('static', filename='index.html'))
