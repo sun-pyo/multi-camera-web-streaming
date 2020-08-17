@@ -33,12 +33,12 @@ class ImageSender():
         connect to that remote socket after setting up the REQ
         socket on this computer.
         """
-
+        
         self.zmq_context = SerializingContext()
         self.zmq_socket = self.zmq_context.socket(zmq.REQ)
         self.zmq_socket.connect(connect_to)
 
-    def send_image(self, msg, image):
+    def send_image(self, num, msg, image):
         """Sends OpenCV image and msg to hub computer.
 
         Arguments:
@@ -51,15 +51,15 @@ class ImageSender():
 
         if image.flags['C_CONTIGUOUS']:
             # if image is already contiguous in memory just send it
-            self.zmq_socket.send_array(image, msg, copy=False)
+            self.zmq_socket.send_array(image, msg, num, copy=False)
         else:
             # else make it contiguous before sending
             image = np.ascontiguousarray(image)
-            self.zmq_socket.send_array(image, msg, copy=False)
+            self.zmq_socket.send_array(image, msg, num,copy=False)
         hub_reply = self.zmq_socket.recv()  # receive the reply message
         return hub_reply
 
-    def send_jpg(self, msg, jpg_buffer):
+    def send_jpg(self, num, msg, jpg_buffer):
         """Sends msg text and jpg buffer to hub computer.
 
         Arguments:
@@ -69,7 +69,7 @@ class ImageSender():
           A text reply from hub.
         """
 
-        self.zmq_socket.send_jpg(msg, jpg_buffer, copy=False)
+        self.zmq_socket.send_jpg(num, msg, jpg_buffer, copy=False)
         hub_reply = self.zmq_socket.recv()  # receive the reply message
         return hub_reply
 
@@ -105,8 +105,8 @@ class ImageHub():
           image: OpenCV image.
         """
 
-        msg, image = self.zmq_socket.recv_array(copy=False)
-        return msg, image
+        num, msg, image = self.zmq_socket.recv_array(copy=False)
+        return num, msg, image
 
     def recv_jpg(self, copy=False):
         """Receives text msg, jpg buffer.
@@ -118,8 +118,8 @@ class ImageHub():
           jpg_buffer: bytestring jpg compressed image
         """
 
-        msg, jpg_buffer = self.zmq_socket.recv_jpg(copy=False)
-        return msg, jpg_buffer
+        num, msg, jpg_buffer = self.zmq_socket.recv_jpg(copy=False)
+        return num, msg, jpg_buffer
 
     def send_reply(self, reply_message=b'OK'):
         """Sends the zmq REP reply message.
@@ -128,6 +128,7 @@ class ImageHub():
           reply_message: reply message text, often just string 'OK'
         """
         self.zmq_socket.send(reply_message)
+
 
 
 class SerializingSocket(zmq.Socket):
@@ -139,7 +140,7 @@ class SerializingSocket(zmq.Socket):
     Also used for sending / receiving jpg compressed OpenCV images.
     """
 
-    def send_array(self, A, msg='NoName', flags=0, copy=True, track=False):
+    def send_array(self, A, msg='NoName', num=0, flags=0, copy=True, track=False):
         """Sends a numpy array with metadata and text message.
 
         Sends a numpy array with the metadata necessary for reconstructing
@@ -155,6 +156,7 @@ class SerializingSocket(zmq.Socket):
         """
 
         md = dict(
+            num=num,
             msg=msg,
             dtype=str(A.dtype),
             shape=A.shape,
@@ -163,6 +165,7 @@ class SerializingSocket(zmq.Socket):
         return self.send(A, flags, copy=copy, track=track)
 
     def send_jpg(self,
+                 num=0,
                  msg='NoName',
                  jpg_buffer=b'00',
                  flags=0,
@@ -205,7 +208,7 @@ class SerializingSocket(zmq.Socket):
         md = self.recv_json(flags=flags)
         msg = self.recv(flags=flags, copy=copy, track=track)
         A = np.frombuffer(msg, dtype=md['dtype'])
-        return (md['msg'], A.reshape(md['shape']))
+        return (md['num'], md['msg'], A.reshape(md['shape']))
 
     def recv_jpg(self, flags=0, copy=True, track=False):
         """Receives a jpg buffer and a text msg.
@@ -225,7 +228,7 @@ class SerializingSocket(zmq.Socket):
 
         md = self.recv_json(flags=flags)  # metadata text
         jpg_buffer = self.recv(flags=flags, copy=copy, track=track)
-        return (md['msg'], jpg_buffer)
+        return (md['num'], md['msg'], jpg_buffer)
 
 
 class SerializingContext(zmq.Context):
