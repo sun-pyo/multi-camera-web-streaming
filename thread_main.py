@@ -3,6 +3,8 @@ import sys
 #from mail import sendEmail
 from flask import Flask, render_template, Response
 from flask_basicauth import BasicAuth
+import itertools
+from flask import redirect, request, url_for
 import time
 import threading
 import imagezmq
@@ -29,7 +31,7 @@ last_epoch = 0
 @app.route('/')
 @basic_auth.required
 def index():
-    return render_template('index.html')
+    return render_template('index.html', html_dnum = WebcamVideoStream.read_dnum())
 
 def gen():
     while True:
@@ -48,6 +50,18 @@ def gen():
 def video_feed():
     return Response(gen(),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
+
+@app.route('/drone_num')
+def drone_num():
+    if request.headers.get('accept') == 'text/event-stream':
+        def events():
+            while True:
+                yield "data: %d\n\n" % (WebcamVideoStream.read_dnum())
+                time.sleep(.1)  # an artificial delay
+        return Response(events(), content_type='text/event-stream')
+    return redirect(url_for('static', filename='index.html'))
+
+
 
 if __name__ == '__main__':
     WebcamVideoStream().start()

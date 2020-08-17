@@ -7,10 +7,10 @@
     <!-- The core Firebase JS SDK is always required and must be listed first -->
     <script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-firestore.js"></script>
+    <script src="http://code.jquery.com/jquery-latest.js"></script>
     <script>
         function insert_pan(num){
             document.pan.panview.value = document.pan.panview.value + num
-            
         }
         function equal_pan(){
             var pan_exp = document.pan.panview.value;
@@ -30,6 +30,12 @@
         function init(){
             document.tilt.tiltview.value = 0
             document.pan.panview.value = 0
+        }
+        if (!!window.EventSource) {
+        var source = new EventSource('/drone_num');
+        source.onmessage = function(e) {
+            $("#Drone_Num").text("Num of Drone: " + e.data);
+        }
         }
     </script>
 
@@ -51,8 +57,8 @@
 </head>
 <body>
     <h1>Raspberry Pi Security Feed</h1>
-    <img id="bg" src="{{ url_for('video_feed') }}">
-    <h1 id="NumberOfDroneOutput">Number of Drone: </h1>
+    <img id="bg" src="{{ url_for('video_feed')}}">
+    <h3 id="Drone_Num"> Drone : </h3>
     <h2 id="timedate">Date: </h2>
     <input type="textfield" id="Num_of_drone" />
     <button id ="saveButton">Save</button>
