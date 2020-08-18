@@ -44,11 +44,40 @@ def gen():
             else:
                 print("frame is none")
         
+def cam(cam_index):
+    while True:
+        frame = WebcamVideoStream.read_frame('cam'+str(cam_index))
+        ret, jpeg = cv2.imencode('.jpg',frame)
+        if jpeg is not None:
+            yield (b'--frame\r\n'
+                    b'Content-Type: image/jpeg\r\n\r\n' + jpeg.tobytes() + b'\r\n\r\n')
+        else:
+            print("frame is none")
 
 
 @app.route('/video_feed')
 def video_feed():
     return Response(gen(),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
+
+@app.route('/video_feed1')
+def video_feed1():
+    return Response(cam(1),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
+
+@app.route('/video_feed2')
+def video_feed2():
+    return Response(cam(2),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
+
+@app.route('/video_feed3')
+def video_feed3():
+    return Response(cam(3),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
+
+@app.route('/video_feed4')
+def video_feed4():
+    return Response(cam(4),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route('/drone_num')
@@ -57,10 +86,8 @@ def drone_num():
     if request.headers.get('accept') == 'text/event-stream':
         def events():
             while True:
-                yield "data: %s:%d %s:%d %s:%d %s:%d\n\n" % (rpi_name_list[0], WebcamVideoStream.read_dnum(rpi_name_list),
-                                                            rpi_name_list[1], WebcamVideoStream.read_dnum(rpi_name_list[1]),
-                                                            rpi_name_list[2], WebcamVideoStream.read_dnum(rpi_name_list[2]),
-                                                            rpi_name_list[3], WebcamVideoStream.read_dnum(rpi_name_list[3]))
+                for i in range(4):
+                    yield "data%d: %s:%d\n\n" % (i+1,rpi_name_list[i], WebcamVideoStream.read_dnum(rpi_name_list[i]))
                 time.sleep(.1)  # an artificial delay
         return Response(events(), content_type='text/event-stream')
     return redirect(url_for('static', filename='index.html'))

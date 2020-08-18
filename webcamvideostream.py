@@ -15,7 +15,7 @@ class WebcamVideoStream:
     def __init__(self):
         print("init")
         self.imageHub = imagezmq.ImageHub()
-        self.frameDict = {}
+        #self.frameDict = {}
         self.lastActive = {}
 
         self.lastActiveCheck = datetime.now()
@@ -33,7 +33,8 @@ class WebcamVideoStream:
         self.montages = self.frame
         self.stopped = False
         time.sleep(2.0)
-
+    
+    frameDict_static = {}
     dnum_static = {}
     montages_static = None
     
@@ -67,11 +68,13 @@ class WebcamVideoStream:
                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
 
             # update the new frame in the frame dictionary
-            self.frameDict[self.rpiName] = self.frame
+            
+            self.update_frame(self.rpiName,self.frame)
 
             # build a montage using images in the frame dictionary
-            self.montages = build_montages(self.frameDict.values(), (self.w, self.h), (self.mW, self.mH))
-            self.update_montages(self.montages)
+            
+            #self.montages = build_montages(self.frameDict.values(), (self.w, self.h), (self.mW, self.mH))
+            #self.update_montages(self.montages)
 
             cv2.waitKey(1)
 
@@ -88,6 +91,11 @@ class WebcamVideoStream:
                 # set the last active check time as current time
                 self.lastActiveCheck = datetime.now()
 
+    
+    @classmethod
+    def update_frame(cls, name, frame):
+        cls.frameDict_static[name] = frame
+
     @classmethod
     def update_dnum(cls, dnum, name):
         cls.dnum_static[name] = dnum
@@ -96,9 +104,16 @@ class WebcamVideoStream:
     def update_montages(cls, montages):
         cls.montages_static = montages
 
+
+    @classmethod
+    def read_frame(cls, name):
+        if name in cls.frameDict_static:
+            return cls.frameDict_static[name]
+        else:
+            return None
+
     @classmethod
     def read_dnum(cls, name):
-        name = str(name)
         if name in cls.dnum_static:
             return cls.dnum_static[name]
         else:
