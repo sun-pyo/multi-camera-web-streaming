@@ -28,8 +28,11 @@ class WebcamVideoStream:
         self.w = 0
         self.h = 0
 
-        (self.dnum, self.rpiName, self.frame) = self.imageHub.recv_image()
-        self.imageHub.send_reply(b'OK')
+        self.dnum = 0 
+        self.rpiName = None 
+        self.frame = cv2.imread('no_signal.jpg')
+        self.frame = imutils.resize(self.frame, width=400)
+        #self.imageHub.send_reply(b'OK')
         self.montages = self.frame
         self.stopped = False
         time.sleep(2.0)
@@ -52,7 +55,7 @@ class WebcamVideoStream:
                 return
             (self.dnum, self.rpiName, self.frame) = self.imageHub.recv_image()
             self.imageHub.send_reply(b'OK')
-            self.update_dnum(self.dnum, self.rpiName)
+            self.dnum_static[self.rpiName] = self.dnum
 
             if self.rpiName not in self.lastActive.keys():
                 print("[INFO] receiving data from {}...".format(self.rpiName))
@@ -69,12 +72,10 @@ class WebcamVideoStream:
 
             # update the new frame in the frame dictionary
             
-            self.update_frame(self.rpiName,self.frame)
+            self.frameDict_static[self.rpiName] = self.frame
 
             # build a montage using images in the frame dictionary
-            
-            #self.montages = build_montages(self.frameDict.values(), (self.w, self.h), (self.mW, self.mH))
-            #self.update_montages(self.montages)
+            #self.montages_static = build_montages(self.frameDict.values(), (self.w, self.h), (self.mW, self.mH))
 
             cv2.waitKey(1)
 
@@ -91,14 +92,6 @@ class WebcamVideoStream:
                 # set the last active check time as current time
                 self.lastActiveCheck = datetime.now()
 
-    
-    @classmethod
-    def update_frame(cls, name, frame):
-        cls.frameDict_static[name] = frame
-
-    @classmethod
-    def update_dnum(cls, dnum, name):
-        cls.dnum_static[name] = dnum
 
     @classmethod
     def update_montages(cls, montages):
@@ -110,7 +103,9 @@ class WebcamVideoStream:
         if name in cls.frameDict_static:
             return cls.frameDict_static[name]
         else:
-            return None
+            default_frame = cv2.imread('no_signal.jpg')
+            default_frame = imutils.resize(default_frame, width=400)
+            return default_frame
 
     @classmethod
     def read_dnum(cls, name):

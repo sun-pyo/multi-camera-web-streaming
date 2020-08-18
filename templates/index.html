@@ -35,10 +35,10 @@
         if (!!window.EventSource) {
             var source = new EventSource('/drone_num');
             source.onmessage = function(e) {
-                $("#Drone_Num1").text(e.data1);
-                $("#Drone_Num2").text(e.data2);
-                $("#Drone_Num3").text(e.data3);
-                $("#Drone_Num4").text(e.data4);
+                var jbSplit = e.data.split(',');
+                for ( var i in jbSplit ) {
+                    $("#Drone_Num"+ i).text(jbSplit[i]);
+                }
             }
         }
         
@@ -68,10 +68,10 @@
     <img id="bg" src="{{ url_for('video_feed3')}}">
     <img id="bg" src="{{ url_for('video_feed4')}}">
     
+    <h3 id="Drone_Num0"> Drone : </h3>
     <h3 id="Drone_Num1"> Drone : </h3>
     <h3 id="Drone_Num2"> Drone : </h3>
     <h3 id="Drone_Num3"> Drone : </h3>
-    <h3 id="Drone_Num4"> Drone : </h3>
 
     <h2 id="timedate">Date: </h2>
     <input type="textfield" id="Num_of_drone" />
