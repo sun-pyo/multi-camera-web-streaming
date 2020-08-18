@@ -86,9 +86,11 @@ def drone_num():
     if request.headers.get('accept') == 'text/event-stream':
         def events():
             while True:
-                for i in range(4):
-                    yield "data%d: %s:%d\n\n" % (i+1,rpi_name_list[i], WebcamVideoStream.read_dnum(rpi_name_list[i]))
-                time.sleep(.1)  # an artificial delay
+                    yield "data: %s: %d, %s: %d, %s: %d, %s: %d\n\n" % (rpi_name_list[0], WebcamVideoStream.read_dnum(rpi_name_list[0]),
+                                                                    rpi_name_list[1], WebcamVideoStream.read_dnum(rpi_name_list[1]),
+                                                                    rpi_name_list[2], WebcamVideoStream.read_dnum(rpi_name_list[2]),
+                                                                    rpi_name_list[3], WebcamVideoStream.read_dnum(rpi_name_list[3]))
+                    time.sleep(.1)  # an artificial delay
         return Response(events(), content_type='text/event-stream')
     return redirect(url_for('static', filename='index.html'))
 

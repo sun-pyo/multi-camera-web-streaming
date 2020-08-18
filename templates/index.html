@@ -41,6 +41,28 @@
                 }
             }
         }
+        $(document).ready(function (e){
+            $(document).on("click","img",function(){
+                var path = $(this).attr('src')
+                showImage(path);
+            });//end click event
+            
+            function showImage(fileCallPath){
+                
+                $(".bigPictureWrapper").css("display","flex").show();
+                
+                $(".bigPicture")
+                .html("<img src='"+fileCallPath+"' >");
+                
+            }//end fileCallPath
+            
+            $(".bigPictureWrapper").on("click", function(e){
+                setTimeout(function(){
+                $('.bigPictureWrapper').hide();
+                }, 500);
+            });//end bigWrapperClick event
+        });
+        
         
     </script>
 
@@ -57,13 +79,39 @@
           margin:2;
           cursor:pointer
         }
+        .bigPictureWrapper {
+			position: absolute;
+			display: none;
+			justify-content: center;
+			align-items: center;
+			top:0%;
+			width:100%;
+			height:100%;
+			background-color: gray; 
+			z-index: 100;
+			background:rgba(255,255,255,0.5);
+		}
+		.bigPicture {
+			position: relative;
+			display:flex;
+			justify-content: center;
+			align-items: center;
+		}
+		
+		.bigPicture img {
+			width:800px;
+		}
       </style>
     </head>
 </head>
 <body>
     <h1>Raspberry Pi Security Feed</h1>
-    <img id="bg" src="{{ url_for('video_feed1')}}">
-    <img id="bg" src="{{ url_for('video_feed2')}}">
+    <div class='bigPictureWrapper'>
+		<div class='bigPicture'>
+		</div>
+	</div>
+    <img id="bg" class="cam" src="{{ url_for('video_feed1')}}">
+    <img id="bg" class="cam" src="{{ url_for('video_feed2')}}">
     <div></div>
     <img id="bg" src="{{ url_for('video_feed3')}}">
     <img id="bg" src="{{ url_for('video_feed4')}}">

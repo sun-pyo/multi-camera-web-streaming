@@ -92,12 +92,6 @@ class WebcamVideoStream:
                 # set the last active check time as current time
                 self.lastActiveCheck = datetime.now()
 
-
-    @classmethod
-    def update_montages(cls, montages):
-        cls.montages_static = montages
-
-
     @classmethod
     def read_frame(cls, name):
         if name in cls.frameDict_static:
