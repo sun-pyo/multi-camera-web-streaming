@@ -167,9 +167,9 @@ while True:  # send images as stream until Ctrl-C
       #cv2.rectangle(frame, (xmin[i],ymin[i]), (xmax[i],ymax[i]), rectangule_color, boxthickness)  #xmax = x+w ymax = y+h 
       #time_appear_drone = time_appear_drone + 1
             
-      print('scores',scores)
+      #print('scores',scores)
       if scores[i] > 0.5:
-        num.append(scores[i])
+        num.append(str(scores[i]))
         #print('num',num)
                 
       if len(num) != 0:
@@ -202,14 +202,15 @@ while True:  # send images as stream until Ctrl-C
   # Draw framerate in corner of frame
   #cv2.putText(frame,'FPS: {0:.2f}'.format(frame_rate_calc),(30,50),cv2.FONT_HERSHEY_SIMPLEX,1,(255,255,0),2,cv2.LINE_AA)
   #cv2.putText(frame, text, (30, 100), cv2.FONT_HERSHEY_SIMPLEX,1,(255,255,0),2,cv2.LINE_AA)
-  Drone_data[0] = len(num)
-  Drone_data[1] = ymin
-  Drone_data[2] = xmin
-  Drone_data[3] = ymax
-  Drone_data[4] = xmax
-  Drone_data[5] = scores
-  sender.send_image(Drone_data, rpi_name, frame)
+  Drone_data.append(len(num))
+  Drone_data.append(ymin)
+  Drone_data.append(xmin)
+  Drone_data.append(ymax)
+  Drone_data.append(xmax)
+  Drone_data.append(num)
 
+  mem = sender.send_image(Drone_data, rpi_name, frame)
+  print(mem)
   # Calculate framerate
   t2 = cv2.getTickCount()
   time1 = (t2-t1)/freq

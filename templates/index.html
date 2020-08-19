@@ -1,53 +1,40 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Drone</title>
-    <!-- The core Firebase JS SDK is always required and must be listed first -->
-    <script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-firestore.js"></script>
+<html>
+  <head>
+    <!-- 합쳐지고 최소화된 최신 CSS -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css"
+    />
+
+    <!-- 부가적인 테마 -->
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css"
+    />
+
+    <!-- 합쳐지고 최소화된 최신 자바스크립트 -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.0.min.js"></script>
     <script src="http://code.jquery.com/jquery-latest.js"></script>
     <script>
-        function insert_pan(num){
-            document.pan.panview.value = document.pan.panview.value + num
-        }
-        function equal_pan(){
-            var pan_exp = document.pan.panview.value;
-            if(pan_exp){
-                document.pan.panview.value=eval(pan_exp)
-            }
-        }
-        function insert_tilt(num){
-            document.tilt.tiltview.value = document.tilt.tiltview.value + num
-        }
-        function equal_tilt(){
-            var tilt_exp = document.tilt.tiltview.value;
-            if(tilt_exp){
-                document.tilt.tiltview.value=eval(tilt_exp)
-            }
-        }
-        function init(){
-            document.tilt.tiltview.value = 0
-            document.pan.panview.value = 0
-        }
-
-        if (!!window.EventSource) {
-            var source = new EventSource('/drone_num');
-            source.onmessage = function(e) {
-                var jbSplit = e.data.split(',');
-                for ( var i in jbSplit ) {
-                    $("#Drone_Num"+ i).text(jbSplit[i]);
-                }
-            }
-        }
-        $(document).ready(function (e){
+      if (!!window.EventSource) {
+        var source = new EventSource("/drone_num");
+        source.onmessage = function (e) {
+          var jbSplit = e.data.split(",");
+          for (var i in jbSplit) {
+            $("#cam" + i).text(jbSplit[i]);
+          }
+        };
+      }
+      $(document).ready(function (e){
             $(document).on("click","img",function(){
                 var path = $(this).attr('src')
                 showImage(path);
             });//end click event
             
-            function showImage(fileCallPath){
+      function showImage(fileCallPath){
                 
                 $(".bigPictureWrapper").css("display","flex").show();
                 
@@ -59,100 +46,110 @@
             $(".bigPictureWrapper").on("click", function(e){
                 setTimeout(function(){
                 $('.bigPictureWrapper').hide();
-                }, 0);
+                }, 500);
             });//end bigWrapperClick event
         });
-        
-        
     </script>
+    <style>
+      #drone_data{
+        text-align: right;
+      }
+      .bigPictureWrapper {
+        position: absolute;
+        display: none;
+        justify-content: center;
+        align-items: center;
+        top: 0%;
+        width: 100%;
+        height: 100%;
+        background-color: gray;
+        z-index: 100;
+        background: rgba(0, 0, 0, 0.9);
+      }
+      .bigPicture {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
 
-     <style>
-         *{
-          margin:2;
-          padding:2;
-        }
-        button{
-          width:150;
-          height:150;
-          font-size:50;
-          font-style:bord;
-          margin:2;
-          cursor:pointer
-        }
-        .bigPictureWrapper {
-			position: absolute;
-			display: none;
-			justify-content: center;
-			align-items: center;
-			top:0%;
-			width:100%;
-			height:100%;
-			background-color: gray; 
-			z-index: 100;
-			background:rgba(255,255,255,0.5);
-		}
-		.bigPicture {
-			position: relative;
-			display:flex;
-			justify-content: center;
-			align-items: center;
-		}
-		
-		.bigPicture img {
-			width:1000px;
-		}
-      </style>
-    </head>
-</head>
-<body>
-    <h1>Raspberry Pi Security Feed</h1>
-    <div class='bigPictureWrapper'>
-		<div class='bigPicture'>
-		</div>
-	</div>
-    <img id="bg" class="cam" src="{{ url_for('video_feed1')}}">
-    <img id="bg" class="cam" src="{{ url_for('video_feed2')}}">
-    <div></div>
-    <img id="bg" src="{{ url_for('video_feed3')}}">
-    <img id="bg" src="{{ url_for('video_feed4')}}">
-    
-    <h3 id="Drone_Num0"> Drone : </h3>
-    <h3 id="Drone_Num1"> Drone : </h3>
-    <h3 id="Drone_Num2"> Drone : </h3>
-    <h3 id="Drone_Num3"> Drone : </h3>
+      .bigPicture img {
+        width: 1000px;
+      }
+    </style>
 
-    <h2 id="timedate">Date: </h2>
-    <input type="textfield" id="Num_of_drone" />
-    <button id ="saveButton">Save</button>
-    <button id ="loadButton">Load</button>
-    <div class="controller">
-        <table>
-            <caption>controlrobot</caption>
-            <tr>
-                <td><input class="button" type="button" value="-" ></td>
-                <td><input class="button" type="button" value="U" id="UPButton"onclick="insert_tilt('+'+1);equal_tilt()"></td>
-                <td><input class="button" type="button" value="-" ></td>
-            </tr>
-            <tr>
-                <td><input class="button" type="button" value="L" id="LEFTButton" onclick="insert_pan(-1);equal_pan()"></td>
-                <td><input class="button" type="button" value="C" id="initButton" onclick="init()" ></td>
-                <td><input class="button" type="button" value="R" id="RIGHTButton" onclick="insert_pan('+'+1);equal_pan()"></td>
-            </tr>
-            <tr>
-                <td><input class="button" type="button" value="-"></td>
-                <td><input class="button" type="button" value="D" id="DOWNButton" onclick="insert_tilt(-1);equal_tilt()"></td>
-                <td><input class="button" type="button" value="-"></td>
-            </tr>       
-        </table>
-        <caption>pan</caption>
-        <form name = "pan" name="pan" id=pan>
-            <input type="panview" name="panview" id="panview">
-        </form>
-        <caption>tilt</caption>
-        <form name = "tilt" name="tilt" id=tilt>
-            <input type="tiltview" name="tiltview" id="tiltview">
-        </form>
+    <title>A.I. Anti-Drone Security Feed</title>
+  </head>
+
+  <body>
+    <div class="bigPictureWrapper">
+      <div class="bigPicture"></div>
     </div>
-    <script src="{{ url_for('static',filename='app.js') }}"></script>
-</body>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button
+            type="button"
+            class="navbar-toggle collapsed"
+            data-toggle="collapse"
+            data-target="#navbar"
+            aria-expanded="false"
+            aria-controls="navbar"
+          >
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#"
+            >A.I. Anti-Drone Security streaming</a
+          >
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="#">Home</a></li>
+            <li><a href="about.html">About</a></li>
+          </ul>
+        </div>
+        <!--/.nav-collapse -->
+      </div>
+    </nav>
+    <div class="container">
+      <br /><br /><br /><br />
+      <div class="row">
+        <div class="col-md-4">
+          
+          <img id="bg" class="cam" src="{{ url_for('video_feed1')}}">
+          <img id="bg" class="cam" src="{{ url_for('video_feed2')}}">
+        </div>
+
+        <div class="col-md-4">
+
+          <img id="bg" src="{{ url_for('video_feed3')}}">
+          <img id="bg" src="{{ url_for('video_feed4')}}">
+           
+        </div>
+
+        <div class="col-md-4" id="drone_data">
+          <h3 id="cam0"></h3>
+          <h3 id="cam1"></h3>
+          <h3 id="cam2"></h3>
+          <h3 id="cam3"></h3>
+          <h4 id="timedate">Date:</h4>
+        </div>
+      </div>
+    </div>
+    <br /><br />
+
+    <div class="container">
+      <br />
+      <hr class="featurette-divider" />
+
+      <footer>
+        <p class="pull-right"><a href="#">Back to top</a></p>
+        <p>&copy; 2020 HANSUNG.univ &middot; Capstone Design</p>
+      </footer>
+    </div>
+  </body>
 </html>

@@ -77,7 +77,7 @@ def video_feed3():
 
 @app.route('/video_feed4')
 def video_feed4():
-    return Response(cam(4),
+    return Response(cam(5),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route('/drone_num')

@@ -28,7 +28,7 @@ class WebcamVideoStream:
         self.w = 0
         self.h = 0
 
-        self.Dronedata = 0 
+        self.Dronedata = []
         self.rpiName = None 
         self.frame = cv2.imread('no_signal.jpg')
         self.frame = imutils.resize(self.frame, width=400)
@@ -96,7 +96,7 @@ class WebcamVideoStream:
     def read_frame(cls, name):
         if name in cls.frameDict:
             frame = cls.frameDict[name]
-            scores = cls.Dronedata_Dict[name][5]
+            scores = list(map(float, cls.Dronedata_Dict[name][5]))
             ymin = cls.Dronedata_Dict[name][1]
             xmin = cls.Dronedata_Dict[name][2]
             ymax = cls.Dronedata_Dict[name][3]

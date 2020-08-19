@@ -25,11 +25,19 @@ vs = VideoStream(usePiCamera=False).start()
  #웹캠이 아니라 PiCamera일 경우 True
 time.sleep(2.0)
 print('start')
- 
+x = [1,2,3]
+y = [2,3,4]
+z = [5,6,7]
+k = [8,9,10]
+new_data = []
+new_data.append(1)
+new_data.append(x)
+new_data.append(z)
+new_data.append(k)
 # 반복적으로 frame을 읽고 서버로 보냅니다.
 while True:
     print('s2')
     frame = vs.read()
     print('send')
-    mem =sender.send_image(rpiName, frame)
-    print('end')
+    mem = sender.send_image(new_data,'cam1', frame)
+    print('end')  
