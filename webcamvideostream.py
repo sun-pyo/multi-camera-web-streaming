@@ -28,7 +28,7 @@ class WebcamVideoStream:
         self.w = 0
         self.h = 0
 
-        self.dnum = 0 
+        self.Dronedata = 0 
         self.rpiName = None 
         self.frame = cv2.imread('no_signal.jpg')
         self.frame = imutils.resize(self.frame, width=400)
@@ -36,9 +36,15 @@ class WebcamVideoStream:
         self.montages = self.frame
         self.stopped = False
         time.sleep(2.0)
-    
-    frameDict_static = {}
-    dnum_static = {}
+
+    rectangule_color = (10, 255, 0)
+    boxthickness = 3
+
+    frameDict = {}
+
+    # index 0 : dnum, index 1 : ymin, index 2 : xmin, index 3: ymax, index 4 : xmax, index 5 : score
+    Dronedata_Dict = {}
+
     montages_static = None
     
     def start(self):
@@ -53,26 +59,20 @@ class WebcamVideoStream:
         while True:
             if self.stopped:
                 return
-            (self.dnum, self.rpiName, self.frame) = self.imageHub.recv_image()
+            (self.Dronedata, self.rpiName, self.frame) = self.imageHub.recv_image()
             self.imageHub.send_reply(b'OK')
-            self.dnum_static[self.rpiName] = self.dnum
+            self.Dronedata_Dict[self.rpiName] = self.Dronedata
 
             if self.rpiName not in self.lastActive.keys():
                 print("[INFO] receiving data from {}...".format(self.rpiName))
             
             self.lastActive[self.rpiName] = datetime.now()
             
-            self.frame = imutils.resize(self.frame, width=400)
+            #self.frame = imutils.resize(self.frame, width=400)
             (self.h, self.w) = self.frame.shape[:2]
 
-
-            # draw the sending device name on the frame
-            cv2.putText(self.frame, self.rpiName, (10, 25),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-
-            # update the new frame in the frame dictionary
-            
-            self.frameDict_static[self.rpiName] = self.frame
+            # update the new frame in the frame dictionary 
+            self.frameDict[self.rpiName] = self.frame
 
             # build a montage using images in the frame dictionary
             #self.montages_static = build_montages(self.frameDict.values(), (self.w, self.h), (self.mW, self.mH))
@@ -94,8 +94,32 @@ class WebcamVideoStream:
 
     @classmethod
     def read_frame(cls, name):
-        if name in cls.frameDict_static:
-            return cls.frameDict_static[name]
+        if name in cls.frameDict:
+            frame = cls.frameDict[name]
+            scores = cls.Dronedata_Dict[name][5]
+            ymin = cls.Dronedata_Dict[name][1]
+            xmin = cls.Dronedata_Dict[name][2]
+            ymax = cls.Dronedata_Dict[name][3]
+            xmax = cls.Dronedata_Dict[name][4]
+            for i in range(len(scores)):
+                if ((scores[i] > 0.5) and (scores[i] <= 1.0)):
+
+                    cv2.rectangle(frame, (xmin[i],ymin[i]), (xmax[i],ymax[i]), cls.rectangule_color, cls.boxthickness)  #xmax = x+w ymax = y+h 
+                    # Draw label
+                    #object_name = labels[int(classes[i])] # Look up object name from "labels" array using class index
+                    #print('Number of Drone', len(num))
+                    label = '%s: %d%%' % ('Drone', int(scores[i]*100)) # Example: 'person: 72%' #object_name
+                    labelSize, baseLine = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.7, 2) # Get font size
+                    label_ymin = max(ymin[i], labelSize[1] + 10) # Make sure not to draw label too close to top of window
+                    cv2.rectangle(frame, (xmin[i], label_ymin-labelSize[1]-10), (xmin[i]+labelSize[0], label_ymin+baseLine-10), (255, 255, 255), cv2.FILLED) # Draw white box to put label text in
+                    cv2.putText(frame, label, (xmin[i], label_ymin-7), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2) # Draw label text
+                    
+            # draw the sending device name on the frame
+            cv2.putText(frame, name, (350, 25),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+
+            frame = imutils.resize(frame, width=400)
+            return frame
         else:
             default_frame = cv2.imread('no_signal.jpg')
             default_frame = imutils.resize(default_frame, width=400)
@@ -103,8 +127,8 @@ class WebcamVideoStream:
 
     @classmethod
     def read_dnum(cls, name):
-        if name in cls.dnum_static:
-            return cls.dnum_static[name]
+        if name in cls.Dronedata_Dict:
+            return cls.Dronedata_Dict[name][0]
         else:
             return 0    
 

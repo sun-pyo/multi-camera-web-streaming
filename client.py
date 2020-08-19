@@ -149,21 +149,26 @@ while True:  # send images as stream until Ctrl-C
   scores = interpreter.get_tensor(output_details[2]['index'])[0] # Confidence of detected objects
   #num = interpreter.get_tensor(output_details[3]['index'])[0]  # Total number of detected objects (inaccurate and not needed)
   num = []
+  ymin = []
+  xmin = []
+  ymax = []
+  xmax = []
+  Drone_data = []
 # Loop over all detections and draw detection box if confidence is above minimum threshold
   for i in range(len(scores)):
     if ((scores[i] > min_conf_threshold) and (scores[i] <= 1.0)):
       # Get bounding box coordinates and draw box
       # Interpreter can return coordinates that are outside of image dimensions, need to force them to be within image using max() and min()
-      ymin = int(max(1,(boxes[i][0] * imH)))
-      xmin = int(max(1,(boxes[i][1] * imW)))
-      ymax = int(min(imH,(boxes[i][2] * imH)))
-      xmax = int(min(imW,(boxes[i][3] * imW)))
+      ymin.append(int(max(1,(boxes[i][0] * imH))))
+      xmin.append(int(max(1,(boxes[i][1] * imW))))
+      ymax.append(int(min(imH,(boxes[i][2] * imH))))
+      xmax.append(int(min(imW,(boxes[i][3] * imW))))
             
-      cv2.rectangle(frame, (xmin,ymin), (xmax,ymax), rectangule_color, boxthickness)  #xmax = x+w ymax = y+h 
-      time_appear_drone = time_appear_drone + 1
+      #cv2.rectangle(frame, (xmin[i],ymin[i]), (xmax[i],ymax[i]), rectangule_color, boxthickness)  #xmax = x+w ymax = y+h 
+      #time_appear_drone = time_appear_drone + 1
             
       print('scores',scores)
-      if scores[i] > 0.4:
+      if scores[i] > 0.5:
         num.append(scores[i])
         #print('num',num)
                 
@@ -175,45 +180,41 @@ while True:  # send images as stream until Ctrl-C
         lh = int(min(imH,(boxes[most][2] * imH)))
         x_medium = int((lx+lw)/2)
         y_medium = int((ly+lh)/2)
-        cv2.line(frame, (x_medium, 0), (x_medium, 480), (10, 255, 0), linethickness)
-        cv2.line(frame, (0, y_medium), (640, y_medium), (10, 255, 0), linethickness)
+        #cv2.line(frame, (x_medium, 0), (x_medium, 480), (10, 255, 0), linethickness)
+        #cv2.line(frame, (0, y_medium), (640, y_medium), (10, 255, 0), linethickness)
 
       # Draw label
       #object_name = labels[int(classes[i])] # Look up object name from "labels" array using class index
       #print('Number of Drone', len(num))
-      label = '%s: %d%%' % ('Drone', int(scores[i]*100)) # Example: 'person: 72%' #object_name
-      labelSize, baseLine = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.7, 2) # Get font size
-      label_ymin = max(ymin, labelSize[1] + 10) # Make sure not to draw label too close to top of window
-      cv2.rectangle(frame, (xmin, label_ymin-labelSize[1]-10), (xmin+labelSize[0], label_ymin+baseLine-10), (255, 255, 255), cv2.FILLED) # Draw white box to put label text in
-      cv2.putText(frame, label, (xmin, label_ymin-7), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2) # Draw label text
+      #label = '%s: %d%%' % ('Drone', int(scores[i]*100)) # Example: 'person: 72%' #object_name
+      #labelSize, baseLine = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.7, 2) # Get font size
+      #label_ymin = max(ymin, labelSize[1] + 10) # Make sure not to draw label too close to top of window
+      #cv2.rectangle(frame, (xmin, label_ymin-labelSize[1]-10), (xmin+labelSize[0], label_ymin+baseLine-10), (255, 255, 255), cv2.FILLED) # Draw white box to put label text in
+      #cv2.putText(frame, label, (xmin, label_ymin-7), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2) # Draw label text
             
-    if time_appear_drone > 10:
-        rectangule_color = (0,0,255)
-        boxthickness = 7
-        if dnum != len(num):
-            dnum=len(num)
-    else :
-        rectangule_color = (10, 255, 0)
-        thickness = 3
-    
-    
-    if len(num) == 0:
-      time_appear_drone = 0
+    #if len(num) == 0:
+    #  time_appear_drone = 0
       
-    if time_appear_drone <= 0:
-        time_appear_drone=0
+    #if time_appear_drone <= 0:
+    #    time_appear_drone=0
 
   text = "Number of drone is : {} ".format(len(num))
   # Draw framerate in corner of frame
-  cv2.putText(frame,'FPS: {0:.2f}'.format(frame_rate_calc),(30,50),cv2.FONT_HERSHEY_SIMPLEX,1,(255,255,0),2,cv2.LINE_AA)
-  cv2.putText(frame, text, (30, 100), cv2.FONT_HERSHEY_SIMPLEX,1,(255,255,0),2,cv2.LINE_AA)
+  #cv2.putText(frame,'FPS: {0:.2f}'.format(frame_rate_calc),(30,50),cv2.FONT_HERSHEY_SIMPLEX,1,(255,255,0),2,cv2.LINE_AA)
+  #cv2.putText(frame, text, (30, 100), cv2.FONT_HERSHEY_SIMPLEX,1,(255,255,0),2,cv2.LINE_AA)
+  Drone_data[0] = len(num)
+  Drone_data[1] = ymin
+  Drone_data[2] = xmin
+  Drone_data[3] = ymax
+  Drone_data[4] = xmax
+  Drone_data[5] = scores
+  sender.send_image(Drone_data, rpi_name, frame)
 
   # Calculate framerate
   t2 = cv2.getTickCount()
   time1 = (t2-t1)/freq
   frame_rate_calc= 1/time1   
 
-  sender.send_image(dnum,rpi_name, frame)
   # Press 'q' to quit
   if cv2.waitKey(1) == ord('q'):
       break
