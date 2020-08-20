@@ -14,7 +14,7 @@ import imutils
 class WebcamVideoStream:
     def __init__(self):
         print("init")
-        self.imageHub = imagezmq.ImageHub()
+        self.imageHub = imagezmq.ImageHub('tcp://*:5555')
         #self.frameDict = {}
         self.lastActive = {}
 
@@ -95,7 +95,7 @@ class WebcamVideoStream:
     @classmethod
     def read_frame(cls, name):
         if name in cls.frameDict:
-            frame = cls.frameDict[name]
+            frame = cls.frameDict[name].copy()
             scores = list(map(float, cls.Dronedata_Dict[name][5]))
             ymin = cls.Dronedata_Dict[name][1]
             xmin = cls.Dronedata_Dict[name][2]
@@ -115,7 +115,7 @@ class WebcamVideoStream:
                     cv2.putText(frame, label, (xmin[i], label_ymin-7), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2) # Draw label text
                     
             # draw the sending device name on the frame
-            cv2.putText(frame, name, (350, 25),
+            cv2.putText(frame, name, (380, 25),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
 
             frame = imutils.resize(frame, width=400)
@@ -136,6 +136,15 @@ class WebcamVideoStream:
     def read_montages(cls):
         return cls.montages_static
 
+    @classmethod
+    def send_frame(cls, name_list):
+        print('Hi')
+        for name in name_list:
+            if name in cls.frameDict and cls.Dronedata_Dict[name][0] > 0:
+                sender = imagezmq.ImageSender(connect_to="tcp://192.168.137.1:5001")
+                mem=sender.send_image(list(cls.Dronedata_Dict[name]),name, cls.frameDict[name])
+                print(mem)
+            
 
 
     def stop(self):

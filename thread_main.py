@@ -95,7 +95,14 @@ def drone_num():
     return redirect(url_for('static', filename='index.html'))
 
 
+@app.route('/send_img')
+def send_img():
+    name_list = ['cam1','cam2','cam3','cam4','cam5']
+    WebcamVideoStream.send_frame(name_list)
+    return ("nothing")
+
 
 if __name__ == '__main__':
     WebcamVideoStream().start()
     app.run(host='0.0.0.0', debug=False, threaded=True)
+

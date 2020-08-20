@@ -18,6 +18,8 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.5.0.min.js"></script>
     <script src="http://code.jquery.com/jquery-latest.js"></script>
+    <script type=text/javascript> $(function() { $("#send_button").click(function (event) { $.getJSON('/send_img', { },
+    function(data) { }); return false; }); }); </script> 
     <script>
       if (!!window.EventSource) {
         var source = new EventSource("/drone_num");
@@ -46,7 +48,7 @@
             $(".bigPictureWrapper").on("click", function(e){
                 setTimeout(function(){
                 $('.bigPictureWrapper').hide();
-                }, 500);
+                }, 300);
             });//end bigWrapperClick event
         });
     </script>
@@ -137,6 +139,8 @@
           <h3 id="cam2"></h3>
           <h3 id="cam3"></h3>
           <h4 id="timedate">Date:</h4>
+          <input type = "button" id = "send_button" value = "Capture" />
+
         </div>
       </div>
     </div>
