@@ -195,17 +195,25 @@ while True:  # send images as stream until Ctrl-C
     elif y_medium > y_center + 30:
         s.down()
         
+  pulse = []
+  pulse.append(s.get_panpulse())
+  pulse.append(s.get_tiltpulse())
+    
+  
   Drone_data.append(len(num))
   Drone_data.append(ymin)
   Drone_data.append(xmin)
   Drone_data.append(ymax)
   Drone_data.append(xmax)
   Drone_data.append(num)
+  Drone_data.append(pulse)
+  
 
   mes = sender.send_image(Drone_data, rpi_name, frame)
   message = mes.decode()
 
   if len(num) == 0:
+    if len(message.split(' ')) > 1: 
         if message == 'R':
             s.right()
         elif message == 'L':
@@ -216,7 +224,9 @@ while True:  # send images as stream until Ctrl-C
             s.down()
         elif message == 'C':
             s.reset()
-
+    else:
+        mem = message.split(' ')
+        s.set_pulse(mem[0], mem[1])
   
 
   # Calculate framerate

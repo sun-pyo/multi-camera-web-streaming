@@ -15,17 +15,15 @@ import Adafruit_PCA9685
 class ServoMotor():
     """
     Class used for turret control.
-    """
+    """    
     def __init__(self):
         self.pwm = Adafruit_PCA9685.PCA9685()
         self.servo_min = 5  # Min pulse length out of 4096
         self.servo_max = 600  # Max pulse length out of 4096
+        tiltpulse = 580
+        panpulse = 380
         self.pwm.set_pwm_freq(10)
-        self.tiltpulse = 580
-        self.panpulse = 380
         #self.p.ChangeDutyCycle(5.5)
-        
-        
     
     def left(self):
         self.panpulse -= 6
@@ -74,12 +72,22 @@ class ServoMotor():
         self.pwm.set_pwm(1, 0, self.tiltpulse)
         self.pwm.set_pwm(0, 0, self.panpulse)
 
-    def set_pulse(self, tilt, pan):
-        self.tiltpulse = tilt
-        self.panpulse = pan
+    def set_pulse(self, L_or_R, tilt):
+        self.tiltpulse = int(tilt)
+        
+        if L_or_R == 'L':
+            self.panpulse = self.servo_min
+        elif L_or_R == 'R':
+            self.panpulse = self.servo_max
+
         self.pwm.set_pwm(1, 0, self.tiltpulse)
         self.pwm.set_pwm(0, 0, self.panpulse)
 
+    def get_panpulse(self):
+        return self.panpulse
+    
+    def get_tiltpulse(self):
+        return self.panpulse
      
     
 

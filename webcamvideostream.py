@@ -57,10 +57,10 @@ class WebcamVideoStream:
         'cam4':'None'
     }
 
-    # index 0 : dnum, index 1 : ymin, index 2 : xmin, index 3: ymax, index 4 : xmax, index 5 : score
+    # index 0 : dnum, index 1 : ymin, index 2 : xmin, index 3: ymax, index 4 : xmax, index 5 : score, index 6 : pulse
     Dronedata_Dict = {}
+
     frameDict = {}
-    montages_static = None
     
     def start(self):
         print("start thread")
@@ -133,10 +133,15 @@ class WebcamVideoStream:
             if left_dnum == right_dnum:
                 if left_dnum == 0:
                     return 'None'
+                elif max(self.Dronedata_Dict[left][5]) > max(self.Dronedata_Dict[right][5]):
+                     return 'L ' + str(self.Dronedata_Dict[left][6][1])
+                else:
+                    return 'R ' + str(self.Dronedata_Dict[right][6][1])
             elif left_dnum > right_dnum:
-                return 'L'
+                return 'L ' + str(self.Dronedata_Dict[left][6][1])
             elif left_dnum < right_dnum:
-                return 'R'
+                return 'R ' + str(self.Dronedata_Dict[right][6][1])
+
 
     @classmethod
     def move_Up(cls, name):
