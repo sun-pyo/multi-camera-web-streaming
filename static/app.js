@@ -1,5 +1,16 @@
 // Your web app's Firebase configuration
 var firebaseConfig = {
+<<<<<<< HEAD
+=======
+    apiKey: "AIzaSyDJjqUeCYAEcCl0gIsnSaycXhCeuPJJE4c",
+    authDomain: "train-project-14814.firebaseapp.com",
+    databaseURL: "https://train-project-14814.firebaseio.com",
+    projectId: "train-project-14814",
+    storageBucket: "train-project-14814.appspot.com",
+    messagingSenderId: "643500565874",
+    appId: "1:643500565874:web:f0a01d725de39deb1869eb",
+    measurementId: "G-TLD07KEPV2"
+>>>>>>> d15d2c7... 모터 제어 추가
   };
   // Initialize Firebase
   firebase.initializeApp(firebaseConfig);

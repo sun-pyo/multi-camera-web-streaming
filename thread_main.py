@@ -14,6 +14,7 @@ from datetime import datetime
 import imutils
 from webcamvideostream import WebcamVideoStream
 
+
 #email_update_interval = 600 # sends an email only once in this time interval
 #video_camera = VideoCamera(flip=True) # creates a camera object, flip vertically
 #object_classifier = cv2.CascadeClassifier("models/fullbody_recognition_model.xml") # an opencv classifier
@@ -54,30 +55,9 @@ def cam(cam_index):
         else:
             print("frame is none")
 
-
-@app.route('/video_feed')
-def video_feed():
-    return Response(gen(),
-                    mimetype='multipart/x-mixed-replace; boundary=frame')
-
-@app.route('/video_feed1')
-def video_feed1():
-    return Response(cam(1),
-                    mimetype='multipart/x-mixed-replace; boundary=frame')
-
-@app.route('/video_feed2')
-def video_feed2():
-    return Response(cam(2),
-                    mimetype='multipart/x-mixed-replace; boundary=frame')
-
-@app.route('/video_feed3')
-def video_feed3():
-    return Response(cam(3),
-                    mimetype='multipart/x-mixed-replace; boundary=frame')
-
-@app.route('/video_feed4')
-def video_feed4():
-    return Response(cam(5),
+@app.route('/video_feed/<int:idx>')
+def video_feed(idx):
+    return Response(cam(idx),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route('/drone_num')
@@ -99,7 +79,7 @@ def drone_num():
 def send_img():
     name_list = ['cam1','cam2','cam3','cam4','cam5']
     WebcamVideoStream.send_frame(name_list)
-    return ("nothing")
+    return ('')
 
 
 if __name__ == '__main__':

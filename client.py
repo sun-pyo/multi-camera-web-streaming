@@ -4,6 +4,7 @@ import numpy as np
 import sys
 import importlib.util
 import argparse
+from servodrive import ServoMotor
 #from imutils.video import VideoStream
 import os
 from videostream import VideoStream
@@ -12,6 +13,7 @@ import cv2
 import RPi.GPIO as GPIO
 import termios
 import contextlib
+from servodrive import ServoMotor
 
 
 # Define and parse input arguments
@@ -100,6 +102,7 @@ floating_model = (input_details[0]['dtype'] == np.float32)
 
 input_mean = 127.5
 input_std = 127.5
+s= ServoMotor()
 
 # Initialize frame rate calculation
 frame_rate_calc = 1
@@ -116,15 +119,16 @@ rectangule_color = (10, 255, 0)
 
 
 sender = imagezmq.ImageSender(connect_to="tcp://{}:5555".format(args.server))
-print("send")
 rpi_name = socket.gethostname() # send RPi hostname with each image
-print("name")
-#picam = VideoStream(usePiCamera=False).start()
 picam = VideoStream(resolution=(imW,imH),framerate=30).start()
 print(picam.read().shape)
-print("picam")
-time.sleep(2.0)  # allow camera sensor to warm up
-print("sleep")
+time.sleep(1.0)  # allow camera sensor to warm up
+frame1 = picam.read()
+rows, cols, _ = frame1.shape
+x_medium = int(cols / 2)
+x_center = int(cols / 2)
+y_medium = int(rows / 2)
+y_center = int(rows / 2)
 
 while True:  # send images as stream until Ctrl-C
   # Start timer (for calculating frame rate)
@@ -163,44 +167,34 @@ while True:  # send images as stream until Ctrl-C
       xmin.append(int(max(1,(boxes[i][1] * imW))))
       ymax.append(int(min(imH,(boxes[i][2] * imH))))
       xmax.append(int(min(imW,(boxes[i][3] * imW))))
-            
-      #cv2.rectangle(frame, (xmin[i],ymin[i]), (xmax[i],ymax[i]), rectangule_color, boxthickness)  #xmax = x+w ymax = y+h 
-      #time_appear_drone = time_appear_drone + 1
-            
-      #print('scores',scores)
-      if scores[i] > 0.5:
-        num.append(str(scores[i]))
-        #print('num',num)
+      num.append(str(scores[i]))
                 
-      if len(num) != 0:
-        most = num.index(max(num))
-        lx = int(max(1,(boxes[most][1] * imW)))
-        ly = int(max(1,(boxes[most][0] * imH)))
-        lw = int(min(imW,(boxes[most][3] * imW)))
-        lh = int(min(imH,(boxes[most][2] * imH)))
-        x_medium = int((lx+lw)/2)
-        y_medium = int((ly+lh)/2)
-        #cv2.line(frame, (x_medium, 0), (x_medium, 480), (10, 255, 0), linethickness)
-        #cv2.line(frame, (0, y_medium), (640, y_medium), (10, 255, 0), linethickness)
+  if len(num) != 0:
+    most = num.index(max(num))
+    lx = int(max(1,(boxes[most][1] * imW)))
+    ly = int(max(1,(boxes[most][0] * imH)))
+    lw = int(min(imW,(boxes[most][3] * imW)))
+    lh = int(min(imH,(boxes[most][2] * imH)))
+    x_medium = int((lx+lw)/2)
+    y_medium = int((ly+lh)/2)
+    D = lw-lx
+    print(D)
+    distance = round(((-(6/5)*D+268) / 100),2)
+    if distance < 0:
+        distance = 0.2
 
-      # Draw label
-      #object_name = labels[int(classes[i])] # Look up object name from "labels" array using class index
-      #print('Number of Drone', len(num))
-      #label = '%s: %d%%' % ('Drone', int(scores[i]*100)) # Example: 'person: 72%' #object_name
-      #labelSize, baseLine = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.7, 2) # Get font size
-      #label_ymin = max(ymin, labelSize[1] + 10) # Make sure not to draw label too close to top of window
-      #cv2.rectangle(frame, (xmin, label_ymin-labelSize[1]-10), (xmin+labelSize[0], label_ymin+baseLine-10), (255, 255, 255), cv2.FILLED) # Draw white box to put label text in
-      #cv2.putText(frame, label, (xmin, label_ymin-7), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2) # Draw label text
-            
-    #if len(num) == 0:
-    #  time_appear_drone = 0
-      
-    #if time_appear_drone <= 0:
-    #    time_appear_drone=0
-    
-  # Draw framerate in corner of frame
-  #cv2.putText(frame,'FPS: {0:.2f}'.format(frame_rate_calc),(30,50),cv2.FONT_HERSHEY_SIMPLEX,1,(255,255,0),2,cv2.LINE_AA)
-  #cv2.putText(frame, text, (30, 100), cv2.FONT_HERSHEY_SIMPLEX,1,(255,255,0),2,cv2.LINE_AA)
+    if x_medium < x_center - 60:
+        s.left()
+    elif x_medium > x_center + 60:
+        s.right()
+    else :
+        s.stop()
+        
+    if y_medium < y_center - 30:
+        s.up()
+    elif y_medium > y_center + 30:
+        s.down()
+        
   Drone_data.append(len(num))
   Drone_data.append(ymin)
   Drone_data.append(xmin)
@@ -208,8 +202,17 @@ while True:  # send images as stream until Ctrl-C
   Drone_data.append(xmax)
   Drone_data.append(num)
 
-  mem = sender.send_image(Drone_data, rpi_name, frame)
-  print(mem)
+  mes = sender.send_image(Drone_data, rpi_name, frame)
+  message = mes.decode()
+
+  if len(num) == 0:
+        if message == 'R':
+            s.right()
+        elif message == 'L':
+            s.left()
+
+  
+
   # Calculate framerate
   t2 = cv2.getTickCount()
   time1 = (t2-t1)/freq

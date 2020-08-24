@@ -18,8 +18,20 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.5.0.min.js"></script>
     <script src="http://code.jquery.com/jquery-latest.js"></script>
+<<<<<<< HEAD
     <script type=text/javascript> $(function() { $("#send_button").click(function (event) { $.getJSON('/send_img', { },
     function(data) { }); return false; }); }); </script> 
+=======
+    <script type=text/javascript> 
+    $(function () abc{ $("#send_button").click(
+      function (event) { 
+        $.getJSON('/send_img', { },
+        function(data) { }); 
+        return false; 
+      });
+    }); 
+    </script> 
+>>>>>>> d15d2c7... 모터 제어 추가
     <script>
       if (!!window.EventSource) {
         var source = new EventSource("/drone_num");
@@ -30,25 +42,46 @@
           }
         };
       }
+<<<<<<< HEAD
       $(document).ready(function (e){
             $(document).on("click","img",function(){
                 var path = $(this).attr('src')
                 showImage(path);
+=======
+
+
+      $(document).ready(function (e){
+            $(document).on("click","img",function(){
+                var path = $(this).attr('src')
+>>>>>>> d15d2c7... 모터 제어 추가
             });//end click event
             
       function showImage(fileCallPath){
                 
+<<<<<<< HEAD
                 $(".bigPictureWrapper").css("display","flex").show();
                 
                 $(".bigPicture")
                 .html("<img src='"+fileCallPath+"' >");
                 
             }//end fileCallPath
+=======
+            $(".bigPictureWrapper").css("display","flex").show();
+            
+            $(".bigPicture")
+            .html("<img src='"+fileCallPath+"' >");
+            
+            }   
+>>>>>>> d15d2c7... 모터 제어 추가
             
             $(".bigPictureWrapper").on("click", function(e){
                 setTimeout(function(){
                 $('.bigPictureWrapper').hide();
+<<<<<<< HEAD
                 }, 300);
+=======
+                }, 0);
+>>>>>>> d15d2c7... 모터 제어 추가
             });//end bigWrapperClick event
         });
     </script>
@@ -74,7 +107,16 @@
         justify-content: center;
         align-items: center;
       }
+<<<<<<< HEAD
 
+=======
+      .Up{
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+>>>>>>> d15d2c7... 모터 제어 추가
       .bigPicture img {
         width: 1000px;
       }
@@ -86,6 +128,10 @@
   <body>
     <div class="bigPictureWrapper">
       <div class="bigPicture"></div>
+<<<<<<< HEAD
+=======
+      <input type = "button" id = "Up" value = "Up" />
+>>>>>>> d15d2c7... 모터 제어 추가
     </div>
 
     <nav class="navbar navbar-inverse navbar-fixed-top">
@@ -122,14 +168,24 @@
       <div class="row">
         <div class="col-md-4">
           
+<<<<<<< HEAD
           <img id="bg" class="cam" src="{{ url_for('video_feed1')}}">
           <img id="bg" class="cam" src="{{ url_for('video_feed2')}}">
+=======
+          <img  class="cam1" src="{{ url_for('video_feed', idx = 1)}}">
+          <img  class="cam2" src="{{ url_for('video_feed', idx = 2)}}">
+>>>>>>> d15d2c7... 모터 제어 추가
         </div>
 
         <div class="col-md-4">
 
+<<<<<<< HEAD
           <img id="bg" src="{{ url_for('video_feed3')}}">
           <img id="bg" src="{{ url_for('video_feed4')}}">
+=======
+          <img class="cam3" src="{{ url_for('video_feed', idx = 3)}}">
+          <img class="cam4" src="{{ url_for('video_feed', idx = 4)}}">
+>>>>>>> d15d2c7... 모터 제어 추가
            
         </div>
 
@@ -140,7 +196,10 @@
           <h3 id="cam3"></h3>
           <h4 id="timedate">Date:</h4>
           <input type = "button" id = "send_button" value = "Capture" />
+<<<<<<< HEAD
 
+=======
+>>>>>>> d15d2c7... 모터 제어 추가
         </div>
       </div>
     </div>
