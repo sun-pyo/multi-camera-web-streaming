@@ -10,7 +10,7 @@ import RPi.GPIO as GPIO
 # Import the PCA9685 module.
 import Adafruit_PCA9685
 
-
+# "0"(1.5ms 펄스)은 중간, "90"(~ 2ms 펄스)은 오른쪽 끝, "-90"(~ 1ms 펄스)은 왼쪽 끝
 
 class ServoMotor():
     """
@@ -74,6 +74,11 @@ class ServoMotor():
         self.pwm.set_pwm(1, 0, self.tiltpulse)
         self.pwm.set_pwm(0, 0, self.panpulse)
 
+    def set_pulse(self, tilt, pan):
+        self.tiltpulse = tilt
+        self.panpulse = pan
+        self.pwm.set_pwm(1, 0, self.tiltpulse)
+        self.pwm.set_pwm(0, 0, self.panpulse)
 
      
     
