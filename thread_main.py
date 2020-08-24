@@ -80,6 +80,31 @@ def send_img():
     name_list = ['cam1','cam2','cam3','cam4','cam5']
     WebcamVideoStream.send_frame(name_list)
     return ('')
+    
+@app.route('/R/<string:cam>')
+def R(cam):
+    WebcamVideoStream.move_Right(cam)
+    return ('')
+
+@app.route('/L/<string:cam>')
+def L(cam):
+    WebcamVideoStream.move_Left(cam)
+    return ('')
+
+@app.route('/U/<string:cam>')
+def U(cam):
+    WebcamVideoStream.move_Up(cam)
+    return ('')
+
+@app.route('/D/<string:cam>')
+def D(cam):
+    WebcamVideoStream.move_Down(cam)
+    return ('')
+
+@app.route('/C/<string:cam>')
+def C(cam):
+    WebcamVideoStream.move_Init(cam)
+    return ('')
 
 
 if __name__ == '__main__':

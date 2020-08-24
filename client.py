@@ -210,6 +210,12 @@ while True:  # send images as stream until Ctrl-C
             s.right()
         elif message == 'L':
             s.left()
+        elif message == 'U':
+            s.up()
+        elif message == 'D':
+            s.down()
+        elif message == 'C':
+            s.reset()
 
   
 

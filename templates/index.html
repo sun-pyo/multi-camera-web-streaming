@@ -3,35 +3,61 @@
     <!-- 합쳐지고 최소화된 최신 CSS -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link
-      rel="stylesheet"
-      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css"
-    />
 
     <!-- 부가적인 테마 -->
     <link
       rel="stylesheet"
       href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css"
     />
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css"
+    />
 
     <!-- 합쳐지고 최소화된 최신 자바스크립트 -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.5.0.min.js"></script>
     <script src="http://code.jquery.com/jquery-latest.js"></script>
-<<<<<<< HEAD
-    <script type=text/javascript> $(function() { $("#send_button").click(function (event) { $.getJSON('/send_img', { },
-    function(data) { }); return false; }); }); </script> 
-=======
+    <script src="https://code.jquery.com/jquery-3.5.0.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
     <script type=text/javascript> 
-    $(function () abc{ $("#send_button").click(
-      function (event) { 
-        $.getJSON('/send_img', { },
-        function(data) { }); 
-        return false; 
+
+
+    function Click_Send(){
+      $.ajax({
+        url:'/send_img'
       });
-    }); 
+    }
+
+    function Click_L(cam){
+      $.ajax({
+        url:'/L/'+ cam
+      });
+    }
+
+    function Click_R(cam){
+      $.ajax({
+        url:'/R/'+ cam
+      });
+    }
+
+    function Click_U(cam){
+      $.ajax({
+        url:'/U/'+ cam
+      });
+    }
+
+    function Click_D(cam){
+      $.ajax({
+        url:'/D/'+ cam
+      });
+    }
+
+    function Click_C(cam){
+      $.ajax({
+        url:'/C/'+ cam
+      });
+    }
+
     </script> 
->>>>>>> d15d2c7... 모터 제어 추가
     <script>
       if (!!window.EventSource) {
         var source = new EventSource("/drone_num");
@@ -42,46 +68,42 @@
           }
         };
       }
-<<<<<<< HEAD
-      $(document).ready(function (e){
-            $(document).on("click","img",function(){
-                var path = $(this).attr('src')
-                showImage(path);
-=======
 
 
       $(document).ready(function (e){
-            $(document).on("click","img",function(){
+
+        $(document).on("click",".cam_video",function(){
                 var path = $(this).attr('src')
->>>>>>> d15d2c7... 모터 제어 추가
+                
+                var c = $(this).attr('class')
+                var cam = c.split(' ')[1]
+                showImage(path, cam)
             });//end click event
             
-      function showImage(fileCallPath){
+        function showImage(fileCallPath, cam){
                 
-<<<<<<< HEAD
-                $(".bigPictureWrapper").css("display","flex").show();
-                
-                $(".bigPicture")
-                .html("<img src='"+fileCallPath+"' >");
-                
-            }//end fileCallPath
-=======
             $(".bigPictureWrapper").css("display","flex").show();
             
             $(".bigPicture")
             .html("<img src='"+fileCallPath+"' >");
+
+            $('#UpButton').off('click');
+            $('#DownButton').off('click');
+            $('#LeftButton').off('click');
+            $('#RightButton').off('click');
+            $('#IintButton').off('click');
+             
+            $("#UpButton").attr("onclick","Click_U(\""+cam+"\")"); 
+            $("#DownButton").attr("onclick","Click_D(\""+cam+"\")"); 
+            $("#LeftButton").attr("onclick","Click_L(\""+cam+"\")"); 
+            $("#RightButton").attr("onclick","Click_R(\""+cam+"\")"); 
+            $("#IintButton").attr("onclick","Click_C(\""+cam+"\")"); 
+        }
             
-            }   
->>>>>>> d15d2c7... 모터 제어 추가
-            
-            $(".bigPictureWrapper").on("click", function(e){
+            $(".bigPicture").on("click", function(e){
                 setTimeout(function(){
                 $('.bigPictureWrapper').hide();
-<<<<<<< HEAD
-                }, 300);
-=======
                 }, 0);
->>>>>>> d15d2c7... 모터 제어 추가
             });//end bigWrapperClick event
         });
     </script>
@@ -107,31 +129,34 @@
         justify-content: center;
         align-items: center;
       }
-<<<<<<< HEAD
-
-=======
-      .Up{
-        position: relative;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
->>>>>>> d15d2c7... 모터 제어 추가
       .bigPicture img {
         width: 1000px;
       }
-    </style>
-
+</style>
     <title>A.I. Anti-Drone Security Feed</title>
   </head>
 
   <body>
     <div class="bigPictureWrapper">
       <div class="bigPicture"></div>
-<<<<<<< HEAD
-=======
-      <input type = "button" id = "Up" value = "Up" />
->>>>>>> d15d2c7... 모터 제어 추가
+          <table>
+            <caption>controlrobot</caption>
+            <tr>
+                <td><input class="button" type="button" value="-" ></td>
+                <td><input class="button" type="button" value="U" id="UpButton"></td>
+                <td><input class="button" type="button" value="-" ></td>
+            </tr>
+            <tr>
+                <td><input class="button" type="button" value="L" id="LeftButton"></td>
+                <td><input class="button" type="button" value="C" id="IintButton"></td>
+                <td><input class="button" type="button" value="R" id="RightButton"></td>
+            </tr>
+            <tr>
+                <td><input class="button" type="button" value="-"></td>
+                <td><input class="button" type="button" value="D" id="DownButton"></td>
+                <td><input class="button" type="button" value="-"></td>
+            </tr>       
+        </table>
     </div>
 
     <nav class="navbar navbar-inverse navbar-fixed-top">
@@ -168,24 +193,14 @@
       <div class="row">
         <div class="col-md-4">
           
-<<<<<<< HEAD
-          <img id="bg" class="cam" src="{{ url_for('video_feed1')}}">
-          <img id="bg" class="cam" src="{{ url_for('video_feed2')}}">
-=======
-          <img  class="cam1" src="{{ url_for('video_feed', idx = 1)}}">
-          <img  class="cam2" src="{{ url_for('video_feed', idx = 2)}}">
->>>>>>> d15d2c7... 모터 제어 추가
+          <img  class="cam_video cam1" src="{{ url_for('video_feed', idx = 1)}}">
+          <img  class="cam_video cam2" src="{{ url_for('video_feed', idx = 2)}}">
         </div>
 
         <div class="col-md-4">
 
-<<<<<<< HEAD
-          <img id="bg" src="{{ url_for('video_feed3')}}">
-          <img id="bg" src="{{ url_for('video_feed4')}}">
-=======
-          <img class="cam3" src="{{ url_for('video_feed', idx = 3)}}">
-          <img class="cam4" src="{{ url_for('video_feed', idx = 4)}}">
->>>>>>> d15d2c7... 모터 제어 추가
+          <img class="cam_video cam3" src="{{ url_for('video_feed', idx = 3)}}">
+          <img class="cam_video cam4" src="{{ url_for('video_feed', idx = 4)}}">
            
         </div>
 
@@ -195,11 +210,7 @@
           <h3 id="cam2"></h3>
           <h3 id="cam3"></h3>
           <h4 id="timedate">Date:</h4>
-          <input type = "button" id = "send_button" value = "Capture" />
-<<<<<<< HEAD
-
-=======
->>>>>>> d15d2c7... 모터 제어 추가
+          <input type = "button" id = "send_button" value = "Capture" onclick="Click_Send();"/>
         </div>
       </div>
     </div>
