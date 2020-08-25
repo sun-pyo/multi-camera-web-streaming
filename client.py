@@ -213,7 +213,7 @@ while True:  # send images as stream until Ctrl-C
   message = mes.decode()
 
   if len(num) == 0:
-    if len(message.split(' ')) > 1: 
+    if len(message.split(' ')) <= 1: 
         if message == 'R':
             s.right()
         elif message == 'L':

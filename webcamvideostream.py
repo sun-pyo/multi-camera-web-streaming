@@ -57,7 +57,7 @@ class WebcamVideoStream:
         'cam4':'None'
     }
 
-    # index 0 : dnum, index 1 : ymin, index 2 : xmin, index 3: ymax, index 4 : xmax, index 5 : score, index 6 : pulse
+    # index 0 : dnum, index 1 : ymin, index 2 : xmin, index 3: ymax, index 4 : xmax, index 5 : score, index 6 : pulse(pan, tilt)
     Dronedata_Dict = {}
 
     frameDict = {}
@@ -132,15 +132,19 @@ class WebcamVideoStream:
             
             if left_dnum == right_dnum:
                 if left_dnum == 0:
-                    return 'None'
-                elif max(self.Dronedata_Dict[left][5]) > max(self.Dronedata_Dict[right][5]):
+                    return 'None 0'
+                elif max(self.Dronedata_Dict[left][5]) > max(self.Dronedata_Dict[right][5]) and self.Dronedata_Dict[left][6][0] > 445:
                      return 'L ' + str(self.Dronedata_Dict[left][6][1])
-                else:
+                elif max(self.Dronedata_Dict[right][5]) > max(self.Dronedata_Dict[left][5]) and self.Dronedata_Dict[right][6][0] < 445:
                     return 'R ' + str(self.Dronedata_Dict[right][6][1])
-            elif left_dnum > right_dnum:
+                else:
+                    return 'None 0'
+            elif left_dnum > right_dnum and self.Dronedata_Dict[left][6][0] > 445:
                 return 'L ' + str(self.Dronedata_Dict[left][6][1])
-            elif left_dnum < right_dnum:
+            elif left_dnum < right_dnum and self.Dronedata_Dict[right][6][0] < 445:
                 return 'R ' + str(self.Dronedata_Dict[right][6][1])
+            else:
+                return 'None 0'
 
 
     @classmethod
@@ -220,13 +224,12 @@ class WebcamVideoStream:
             return 0    
 
     @classmethod
-    def send_frame(cls, name_list):
-        print('Hi')
+    def send_frame(cls, name_list, adress):
         for name in name_list:
             if name in cls.frameDict and cls.Dronedata_Dict[name][0] > 0:
-                sender = imagezmq.ImageSender(connect_to="tcp://192.168.137.1:5001")
-                mem=sender.send_image(list(cls.Dronedata_Dict[name]),name, cls.frameDict[name])
-                print(mem)
+                print('send img')
+                sender = imagezmq.ImageSender("tcp://{}:5001".format(adress))
+                mem= cls.sender.send_image(list(cls.Dronedata_Dict[name]),name, cls.frameDict[name])
             
     def stop(self):
         self.stopped = True

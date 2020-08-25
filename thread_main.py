@@ -13,12 +13,19 @@ from imutils import build_montages
 from datetime import datetime
 import imutils
 from webcamvideostream import WebcamVideoStream
-
+import argparse
 
 #email_update_interval = 600 # sends an email only once in this time interval
 #video_camera = VideoCamera(flip=True) # creates a camera object, flip vertically
 #object_classifier = cv2.CascadeClassifier("models/fullbody_recognition_model.xml") # an opencv classifier
 # App Globals (do not edit)
+
+# Define and parse input arguments
+parser = argparse.ArgumentParser()
+parser.add_argument("-s", "--save_server", required=True,
+    help="ip address of the save_server to which the client will connect")
+args = parser.parse_args()
+
 app = Flask(__name__)
 app.config['BASIC_AUTH_USERNAME'] = 'pi'
 app.config['BASIC_AUTH_PASSWORD'] = 'pi'
@@ -78,7 +85,7 @@ def drone_num():
 @app.route('/send_img')
 def send_img():
     name_list = ['cam1','cam2','cam3','cam4','cam5']
-    WebcamVideoStream.send_frame(name_list)
+    WebcamVideoStream.send_frame(name_list, args.save_server)
     return ('')
     
 @app.route('/R/<string:cam>')
@@ -103,6 +110,7 @@ def D(cam):
 
 @app.route('/C/<string:cam>')
 def C(cam):
+    print(cam)
     WebcamVideoStream.move_Init(cam)
     return ('')
 

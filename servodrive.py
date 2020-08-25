@@ -10,38 +10,42 @@ import RPi.GPIO as GPIO
 # Import the PCA9685 module.
 import Adafruit_PCA9685
 
-# "0"(1.5ms 펄스)은 중간, "90"(~ 2ms 펄스)은 오른쪽 끝, "-90"(~ 1ms 펄스)은 왼쪽 끝
 
 class ServoMotor():
     """
     Class used for turret control.
     """    
+
+    # freq(10) 0 ~ 180도 -> 200 ~ 690 
+
     def __init__(self):
         self.pwm = Adafruit_PCA9685.PCA9685()
-        self.servo_min = 5  # Min pulse length out of 4096
-        self.servo_max = 600  # Max pulse length out of 4096
-        tiltpulse = 580
-        panpulse = 380
+        self.pan_min = 363  # 60도
+        self.pan_max = 526  # 120도
+        self.servo_mean = 445 # 90도 
+        self.tilt_min = 200 # 0도
+        self.tilt_max = 690 # 180도 
+        self.tiltpulse = self.servo_mean
+        self.panpulse = self.servo_mean
         self.pwm.set_pwm_freq(10)
-        #self.p.ChangeDutyCycle(5.5)
     
     def left(self):
         self.panpulse -= 6
         self.pwm.set_pwm(0, 0, self.panpulse)
-        #time.sleep(0.001)
+        time.sleep(0.001)
         print("left")
         print(self.panpulse)
-        if self.panpulse < 120:
-            self.panpulse = 120
+        if self.panpulse < self.pan_min:
+            self.panpulse = self.pan_min
         
     def right(self):
         self.panpulse += 6
         self.pwm.set_pwm(0, 0, self.panpulse)
-        #time.sleep(0.01)
+        time.sleep(0.001)
         print("right")
         print(self.panpulse)
-        if self.panpulse > 680:
-            self.panpulse = 680
+        if self.panpulse > self.pan_max:
+            self.panpulse = self.pan_max
         
     def stop(self):
         pwm.set_pwm(0, 0, 0)
@@ -51,24 +55,24 @@ class ServoMotor():
     def up(self):
         self.tiltpulse -= 5
         self.pwm.set_pwm(1, 0, self.tiltpulse)
-        #time.sleep(0.01)
+        time.sleep(0.001)
         print("up")
         print(self.tiltpulse)
-        if self.tiltpulse < 100:
-            self.tiltpulse = 100
+        if self.tiltpulse < self.tilt_min:
+            self.tiltpulse = self.tilt_min
         
     def down(self):
         self.tiltpulse += 5
         self.pwm.set_pwm(1, 0, self.tiltpulse)
-        #time.sleep(0.01)
+        time.sleep(0.001)
         print("down")
         print(self.tiltpulse)
-        if self.tiltpulse > 700:
-            self.tiltpulse = 700
+        if self.tiltpulse > self.tilt_max:
+            self.tiltpulse = self.tilt_max
             
     def reset(self):
-        self.tiltpulse = 580
-        self.panpulse = 380
+        self.tiltpulse = self.servo_mean
+        self.panpulse = self.servo_mean
         self.pwm.set_pwm(1, 0, self.tiltpulse)
         self.pwm.set_pwm(0, 0, self.panpulse)
 
@@ -76,9 +80,12 @@ class ServoMotor():
         self.tiltpulse = int(tilt)
         
         if L_or_R == 'L':
-            self.panpulse = self.servo_min
+            self.panpulse = self.pan_min
         elif L_or_R == 'R':
-            self.panpulse = self.servo_max
+            self.panpulse = self.pan_max
+        else:
+            self.panpulse = self.servo_mean
+            self.tiltpulse = self.servo_mean
 
         self.pwm.set_pwm(1, 0, self.tiltpulse)
         self.pwm.set_pwm(0, 0, self.panpulse)
