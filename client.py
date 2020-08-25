@@ -13,7 +13,7 @@ import cv2
 import RPi.GPIO as GPIO
 import termios
 import contextlib
-from servodrive import ServoMotor
+
 
 
 # Define and parse input arguments
