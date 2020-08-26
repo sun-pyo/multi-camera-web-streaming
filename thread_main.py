@@ -27,17 +27,17 @@ parser.add_argument("-s", "--save_server", required=True,
 args = parser.parse_args()
 
 app = Flask(__name__)
-app.config['BASIC_AUTH_USERNAME'] = 'pi'
-app.config['BASIC_AUTH_PASSWORD'] = 'pi'
-app.config['BASIC_AUTH_FORCE'] = True
+#app.config['BASIC_AUTH_USERNAME'] = 'pi'
+#app.config['BASIC_AUTH_PASSWORD'] = 'pi'
+#app.config['BASIC_AUTH_FORCE'] = True
 
-basic_auth = BasicAuth(app)
-last_epoch = 0
+#basic_auth = BasicAuth(app)
+#last_epoch = 0
 
 
 
 @app.route('/')
-@basic_auth.required
+#@basic_auth.required
 def index():
     return render_template('index.html')
 
@@ -82,38 +82,36 @@ def drone_num():
     return redirect(url_for('static', filename='index.html'))
 
 
-@app.route('/send_img')
-def send_img():
-    name_list = ['cam1','cam2','cam3','cam4','cam5']
-    WebcamVideoStream.send_frame(name_list, args.save_server)
-    return ('')
+@app.route('/send_img/<string:cam>')
+def send_img(cam):
+    WebcamVideoStream.send_frame(cam, args.save_server)
+    return '', 204
     
 @app.route('/R/<string:cam>')
 def R(cam):
+    print(cam)
     WebcamVideoStream.move_Right(cam)
-    return ('')
+    return '', 204
 
 @app.route('/L/<string:cam>')
 def L(cam):
     WebcamVideoStream.move_Left(cam)
-    return ('')
+    return '', 204
 
 @app.route('/U/<string:cam>')
 def U(cam):
     WebcamVideoStream.move_Up(cam)
-    return ('')
+    return '', 204
 
 @app.route('/D/<string:cam>')
 def D(cam):
     WebcamVideoStream.move_Down(cam)
-    return ('')
+    return '', 204
 
 @app.route('/C/<string:cam>')
 def C(cam):
-    print(cam)
     WebcamVideoStream.move_Init(cam)
-    return ('')
-
+    return '', 204
 
 if __name__ == '__main__':
     WebcamVideoStream().start()

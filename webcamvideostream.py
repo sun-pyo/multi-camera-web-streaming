@@ -41,7 +41,7 @@ class WebcamVideoStream:
     boxthickness = 3
     map_shape = (400, 400)
 
-    Auto_mode = False
+    Auto_mode = True
 
     Cam_left_right = {
         'cam1':['None', 'cam2'],
@@ -132,45 +132,45 @@ class WebcamVideoStream:
             
             if left_dnum == right_dnum:
                 if left_dnum == 0:
-                    return 'None 0'
-                elif max(self.Dronedata_Dict[left][5]) > max(self.Dronedata_Dict[right][5]) and self.Dronedata_Dict[left][6][0] > 445:
-                     return 'L ' + str(self.Dronedata_Dict[left][6][1])
-                elif max(self.Dronedata_Dict[right][5]) > max(self.Dronedata_Dict[left][5]) and self.Dronedata_Dict[right][6][0] < 445:
-                    return 'R ' + str(self.Dronedata_Dict[right][6][1])
+                    return 'True 0 0'
+                elif max(self.Dronedata_Dict[left][5]) > max(self.Dronedata_Dict[right][5]) and self.Dronedata_Dict[left][6][0] < 445:
+                     return 'True L ' + str(self.Dronedata_Dict[left][6][1])
+                elif max(self.Dronedata_Dict[right][5]) > max(self.Dronedata_Dict[left][5]) and self.Dronedata_Dict[right][6][0] > 445:
+                    return 'True R ' + str(self.Dronedata_Dict[right][6][1])
                 else:
-                    return 'None 0'
-            elif left_dnum > right_dnum and self.Dronedata_Dict[left][6][0] > 445:
-                return 'L ' + str(self.Dronedata_Dict[left][6][1])
-            elif left_dnum < right_dnum and self.Dronedata_Dict[right][6][0] < 445:
-                return 'R ' + str(self.Dronedata_Dict[right][6][1])
+                    return 'True 0 0'
+            elif left_dnum > right_dnum and self.Dronedata_Dict[left][6][0] < 445:
+                return 'True L ' + str(self.Dronedata_Dict[left][6][1])
+            elif left_dnum < right_dnum and self.Dronedata_Dict[right][6][0] > 445:
+                return 'True R ' + str(self.Dronedata_Dict[right][6][1])
             else:
-                return 'None 0'
+                return 'True 0 0'
 
 
     @classmethod
     def move_Up(cls, name):
-        if name in cls.Control_Dict and not cls.Auto_mode:
+        if name in cls.Control_Dict and cls.Auto_mode == False:
             cls.Control_Dict[name] = 'U'
         print('U')
         
     
     @classmethod
     def move_Down(cls, name):
-        if name in cls.Control_Dict and not cls.Auto_mode:
+        if name in cls.Control_Dict and cls.Auto_mode == False:
             cls.Control_Dict[name] = 'D'
         print('D')
         
     
     @classmethod
     def move_Right(cls, name):
-        if name in cls.Control_Dict and not cls.Auto_mode:
+        if name in cls.Control_Dict and cls.Auto_mode == False:
             cls.Control_Dict[name] = 'R'
         print('R')
         
 
     @classmethod
     def move_Left(cls, name):
-        if name in cls.Control_Dict and not cls.Auto_mode:
+        if name in cls.Control_Dict and cls.Auto_mode == False:
             cls.Control_Dict[name] = 'L'
         print('L')
         
@@ -224,12 +224,22 @@ class WebcamVideoStream:
             return 0    
 
     @classmethod
-    def send_frame(cls, name_list, adress):
-        for name in name_list:
-            if name in cls.frameDict and cls.Dronedata_Dict[name][0] > 0:
-                print('send img')
-                sender = imagezmq.ImageSender("tcp://{}:5001".format(adress))
-                mem= cls.sender.send_image(list(cls.Dronedata_Dict[name]),name, cls.frameDict[name])
+    def send_frame(cls, name, adress):
+        if name in cls.frameDict:
+            print('send img')
+            sender = imagezmq.ImageSender("tcp://{}:5001".format(adress))
+            mem= cls.sender.send_image(list(cls.Dronedata_Dict[name]),name, cls.frameDict[name])
+
+    @classmethod
+    def AutoMode_Flag(cls):
+        if cls.Auto_mode == True:
+            cls.Auto_mode = False
+        else:
+            cls.Auto_mode = True
+
+        return cls.Auto_mode
+
+    
             
     def stop(self):
         self.stopped = True

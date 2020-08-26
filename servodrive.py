@@ -30,25 +30,25 @@ class ServoMotor():
         self.pwm.set_pwm_freq(10)
     
     def left(self):
-        self.panpulse -= 6
+        self.panpulse += 6
         self.pwm.set_pwm(0, 0, self.panpulse)
         time.sleep(0.001)
         print("left")
         print(self.panpulse)
-        if self.panpulse < self.pan_min:
-            self.panpulse = self.pan_min
+        if self.panpulse > self.pan_max:
+            self.panpulse = self.pan_max
         
     def right(self):
-        self.panpulse += 6
+        self.panpulse -= 6
         self.pwm.set_pwm(0, 0, self.panpulse)
         time.sleep(0.001)
         print("right")
         print(self.panpulse)
-        if self.panpulse > self.pan_max:
-            self.panpulse = self.pan_max
+        if self.panpulse < self.pan_min:
+            self.panpulse = self.pan_min
         
     def stop(self):
-        pwm.set_pwm(0, 0, 0)
+        self.pwm.set_pwm(0, 0, 0)
         time.sleep(0.005)
         print("stop")
         
@@ -78,14 +78,12 @@ class ServoMotor():
 
     def set_pulse(self, L_or_R, tilt):
         self.tiltpulse = int(tilt)
-        
         if L_or_R == 'L':
-            self.panpulse = self.pan_min
-        elif L_or_R == 'R':
             self.panpulse = self.pan_max
+        elif L_or_R == 'R':
+            self.panpulse = self.pan_min
         else:
-            self.panpulse = self.servo_mean
-            self.tiltpulse = self.servo_mean
+            return
 
         self.pwm.set_pwm(1, 0, self.tiltpulse)
         self.pwm.set_pwm(0, 0, self.panpulse)

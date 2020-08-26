@@ -114,7 +114,7 @@ boxthickness = 3
 linethickness = 2
 # Initialize video stream
 #videostream = VideoStream(resolution=(800,600),framerate=30).start()
-
+Auto_flag = True
 rectangule_color = (10, 255, 0)
 
 
@@ -183,17 +183,18 @@ while True:  # send images as stream until Ctrl-C
     if distance < 0:
         distance = 0.2
 
-    if x_medium < x_center - 60:
-        s.left()
-    elif x_medium > x_center + 60:
-        s.right()
-    else :
-        s.stop()
-        
-    if y_medium < y_center - 30:
-        s.up()
-    elif y_medium > y_center + 30:
-        s.down()
+    if Auto_flag == True:
+        if x_medium < x_center - 60:
+            s.left()
+        elif x_medium > x_center + 60:
+            s.right()
+        else :
+            s.stop()
+            
+        if y_medium < y_center - 30:
+            s.up()
+        elif y_medium > y_center + 30:
+            s.down()
         
   pulse = []
   pulse.append(s.get_panpulse())
@@ -208,25 +209,26 @@ while True:  # send images as stream until Ctrl-C
   Drone_data.append(num)
   Drone_data.append(pulse)
   
-
   mes = sender.send_image(Drone_data, rpi_name, frame)
   message = mes.decode()
+  message = message.split(' ')
+    
+  Auto_flag = bool(message[0])
 
   if len(num) == 0:
-    if len(message.split(' ')) <= 1: 
-        if message == 'R':
+    if Auto_flag == False: 
+        if message[1] == 'R':
             s.right()
-        elif message == 'L':
+        elif message[1] == 'L':
             s.left()
-        elif message == 'U':
+        elif message[1] == 'U':
             s.up()
-        elif message == 'D':
+        elif message[1] == 'D':
             s.down()
-        elif message == 'C':
+        elif message[1] == 'C':
             s.reset()
-    else:
-        mem = message.split(' ')
-        s.set_pulse(mem[0], mem[1])
+    elif Auto_flag == True:
+        s.set_pulse(message[1], message[2])
   
 
   # Calculate framerate
