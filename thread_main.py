@@ -27,17 +27,17 @@ parser.add_argument("-s", "--save_server", required=True,
 args = parser.parse_args()
 
 app = Flask(__name__)
-#app.config['BASIC_AUTH_USERNAME'] = 'pi'
-#app.config['BASIC_AUTH_PASSWORD'] = 'pi'
-#app.config['BASIC_AUTH_FORCE'] = True
+app.config['BASIC_AUTH_USERNAME'] = 'pi'
+app.config['BASIC_AUTH_PASSWORD'] = 'pi'
+app.config['BASIC_AUTH_FORCE'] = True
 
-#basic_auth = BasicAuth(app)
-#last_epoch = 0
+basic_auth = BasicAuth(app)
+last_epoch = 0
 
 
 
 @app.route('/')
-#@basic_auth.required
+@basic_auth.required
 def index():
     return render_template('index.html')
 
@@ -86,6 +86,7 @@ def drone_num():
 def send_img(cam):
     WebcamVideoStream.send_frame(cam, args.save_server)
     return '', 204
+
     
 @app.route('/R/<string:cam>')
 def R(cam):
